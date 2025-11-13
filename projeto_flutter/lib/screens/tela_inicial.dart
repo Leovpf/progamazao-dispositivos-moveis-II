@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'lista_gastos.dart';
 import 'tela_login.dart';
-import '../models/gastos_manager.dart';
+import '../database/dao/gastos_dao.dart';
+import 'status_database/status.dart';
 
 class TelaInicial extends StatelessWidget {
   const TelaInicial({super.key});
@@ -27,16 +28,17 @@ class TelaInicial extends StatelessWidget {
                       child: const Text('Cancelar'),
                     ),
                     TextButton(
-                      onPressed: () async {
+                      onPressed: () {
                         Navigator.pop(context); // Fecha o dialog
-                        // Limpar gastos salvos no logout
-                        await GastosManager.limparGastos();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TelaLogin(),
-                          ),
-                        );
+                        // Limpar gastos salvos no logout e então navegar
+                        GastosDao.deleteAll().then((_) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaLogin(),
+                            ),
+                          );
+                        });
                       },
                       child: const Text('Sair'),
                     ),
@@ -102,6 +104,22 @@ class TelaInicial extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     textStyle: const TextStyle(fontSize: 18),
                   ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StatusDatabaseScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.storage),
+                  label: const Text('Status do Banco'),
                 ),
               ),
               const SizedBox(height: 16),

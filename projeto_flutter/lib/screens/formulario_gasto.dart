@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/editor.dart';
 import '../models/gasto.dart';
+import '../database/dao/gastos_dao.dart';
 
 class FormularioGasto extends StatefulWidget {
   const FormularioGasto({super.key});
@@ -86,7 +87,7 @@ class _FormularioGastoState extends State<FormularioGasto> {
     );
   }
 
-  void _criarGasto(BuildContext context) {
+  Future<void> _criarGasto(BuildContext context) async {
     final String descricao = _controladorDescricao.text;
     final String valorTexto = _controladorValor.text;
 
@@ -118,7 +119,26 @@ class _FormularioGastoState extends State<FormularioGasto> {
       DateTime.now(),
     );
 
-    Navigator.pop(context, novoGasto);
+    try {
+      await GastosDao.inserir(novoGasto);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gasto adicionado com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      // Retornar sinal de sucesso para a lista (para recarregar)
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao salvar: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
