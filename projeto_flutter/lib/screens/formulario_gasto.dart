@@ -4,7 +4,10 @@ import '../models/gasto.dart';
 import '../database/dao/gastos_dao.dart';
 
 class FormularioGasto extends StatefulWidget {
-  const FormularioGasto({super.key});
+  // Alteração: Recebe o gasto opcional para edição
+  final Gasto? gastoParaEditar;
+
+  const FormularioGasto({super.key, this.gastoParaEditar});
 
   @override
   State<FormularioGasto> createState() => _FormularioGastoState();
@@ -26,10 +29,22 @@ class _FormularioGastoState extends State<FormularioGasto> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Alteração: Se houver um gasto para editar, preenche os campos
+    if (widget.gastoParaEditar != null) {
+      _controladorDescricao.text = widget.gastoParaEditar!.descricao;
+      _controladorValor.text = widget.gastoParaEditar!.valor.toString();
+      _categoriaSelecionada = widget.gastoParaEditar!.categoria;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Novo Gasto'),
+        // Alteração: Título dinâmico
+        title: Text(widget.gastoParaEditar == null ? 'Novo Gasto' : 'Editar Gasto'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SingleChildScrollView(
@@ -77,7 +92,7 @@ class _FormularioGastoState extends State<FormularioGasto> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => _criarGasto(context),
-                  child: const Text('Adicionar Gasto'),
+                  child: Text(widget.gastoParaEditar == null ? 'Adicionar Gasto' : 'Salvar Alterações'),
                 ),
               ),
             ),
@@ -112,22 +127,34 @@ class _FormularioGastoState extends State<FormularioGasto> {
       return;
     }
 
+    // Alteração: Mantém o ID e a Data original se for edição
     final Gasto novoGasto = Gasto(
       descricao,
       valor,
       _categoriaSelecionada,
-      DateTime.now(),
+      widget.gastoParaEditar?.data ?? DateTime.now(), // Se editar, mantém a data original
+      id: widget.gastoParaEditar?.id, // Se editar, passa o ID existente
     );
 
     try {
-      await GastosDao.inserir(novoGasto);
+      // Alteração: Decide se é INSERT ou UPDATE
+      if (widget.gastoParaEditar != null) {
+        await GastosDao.update(novoGasto);
+      } else {
+        await GastosDao.inserir(novoGasto);
+      }
+      
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gasto adicionado com sucesso!'),
+        SnackBar(
+          content: Text(widget.gastoParaEditar == null 
+              ? 'Gasto adicionado com sucesso!' 
+              : 'Gasto atualizado com sucesso!'),
           backgroundColor: Colors.green,
         ),
       );
+      
       // Retornar sinal de sucesso para a lista (para recarregar)
       Navigator.pop(context, true);
     } catch (error) {

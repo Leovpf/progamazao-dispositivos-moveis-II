@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'lista_gastos.dart';
 import 'tela_login.dart';
-import '../database/dao/gastos_dao.dart';
 import 'status_database/status.dart';
 
 class TelaInicial extends StatelessWidget {
@@ -30,15 +29,12 @@ class TelaInicial extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context); // Fecha o dialog
-                        // Limpar gastos salvos no logout e então navegar
-                        GastosDao.deleteAll().then((_) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const TelaLogin(),
                             ),
                           );
-                        });
                       },
                       child: const Text('Sair'),
                     ),
