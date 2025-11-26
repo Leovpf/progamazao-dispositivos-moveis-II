@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:path/path.dart';
-// For desktop (Windows/Linux/macOS) initialize ffi-based implementation
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class AppDatabase {
@@ -17,8 +15,6 @@ class AppDatabase {
   }
 
   Future<Database> _initDB(String filePath) async {
-    // On desktop platforms, initialize the ffi implementation and set the
-    // global databaseFactory so the sqflite global API works.
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;

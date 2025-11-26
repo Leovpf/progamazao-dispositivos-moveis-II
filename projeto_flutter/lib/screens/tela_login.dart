@@ -24,7 +24,6 @@ class _TelaLoginState extends State<TelaLogin> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo/Ícone do App
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(

@@ -27,8 +27,6 @@ class _ListaGastosState extends State<ListaGastos> {
     });
   }
 
-  // (usamos remoção diretamente em _confirmarRemocao)
-
   // Mostrar dialog de confirmação para deletar um gasto
   void _confirmarRemocao(Gasto gasto) {
     showDialog(
@@ -222,9 +220,20 @@ class _ListaGastosState extends State<ListaGastos> {
                         vertical: 4,
                       ),
                       child: ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FormularioGasto(gastoParaEditar: gasto),
+                            ),
+                          ).then((sucesso) {
+                            if (sucesso == true) {
+                              _recarregar();
+                            }
+                          });
+                        },
                         leading: CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           child: Icon(
                             _getIconeCategoria(gasto.categoria),
                             color: Colors.white,
@@ -288,7 +297,6 @@ class _ListaGastosState extends State<ListaGastos> {
               builder: (context) => const FormularioGasto(),
             ),
           ).then((novoGasto) {
-            // Formulário retorna `true` quando inserido com sucesso
             if (novoGasto == true) {
               _recarregar();
             }
